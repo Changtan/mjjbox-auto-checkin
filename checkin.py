@@ -4,37 +4,39 @@ import time
 
 BASE_URL = "https://mjjbox.com"
 
+# 从环境变量读取
 COOKIE = os.getenv("MJJBOX_COOKIE")
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN")
 TG_CHAT_ID = os.getenv("TG_CHAT_ID")
-CSRF_TOKEN = os.getenv("CSRF_TOKEN")
+CSRF_TOKEN = os.getenv("CSRF_TOKEN")  # x-csrf-token
 
 MAX_RETRIES = 2
 RETRY_DELAY = 5
+HISTORY_DAYS = 5  # TG 通知显示最近几天的签到历史
 
 def format_checkin_status(data):
-    """把签到 JSON 格式化成可读文本"""
+    """格式化签到状态为可读文本，包括论坛名和最近签到历史"""
     user_checkin_count = data.get('user_checkin_count', 0)
     consecutive_days = data.get('consecutive_days', 0)
     today_checked_in = data.get('today_checked_in', False)
     current_points = data.get('current_points', 0)
 
-    # 本次签到的积分
-    checkin_history = data.get('checkin_history', [])
-    today_points = 0
-    if checkin_history:
-        today_points = checkin_history[0].get('points_earned', 0)
+    checkin_history = data.get('checkin_history', [])[:HISTORY_DAYS]
 
     status = "✅ 已签到" if today_checked_in else "❌ 未签到"
 
-    text = (
-        f"{status}\n"
-        f"连续签到天数: {consecutive_days}\n"
-        f"本次获得积分: {today_points}\n"
-        f"总积分: {current_points}\n"
-        f"累计签到次数: {user_checkin_count}"
-    )
-    return text
+    text = [f"📝 MJJBox 签到结果", "", f"{status}",
+            f"连续签到天数: {consecutive_days}",
+            f"总积分: {current_points}",
+            f"累计签到次数: {user_checkin_count}", "", "最近签到历史:"]
+
+    for h in checkin_history:
+        date = h.get("date", "")
+        days = h.get("consecutive_days", 0)
+        points = h.get("points_earned", 0)
+        text.append(f"{date} → 连续 {days} 天, 获得 {points} 分")
+
+    return "\n".join(text)
 
 def checkin_once():
     headers = {
