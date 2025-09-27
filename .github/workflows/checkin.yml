@@ -1,0 +1,27 @@
+name: MJJBox Checkin
+
+on:
+  schedule:
+    - cron: "0 2 * * *"   # 每天 10:00 (UTC+8)
+  workflow_dispatch:
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Run checkin
+        env:
+          MJJBOX_COOKIE: ${{ secrets.MJJBOX_COOKIE }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python checkin.py
