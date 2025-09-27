@@ -23,12 +23,23 @@ def format_checkin_status(data):
 
     checkin_history = data.get('checkin_history', [])[:HISTORY_DAYS]
 
+    # 今日签到积分
+    today_points = 0
+    if checkin_history:
+        today_points = checkin_history[0].get('points_earned', 0)
+
     status = "✅ 已签到" if today_checked_in else "❌ 未签到"
 
-    text = [f"📝 MJJBox 签到结果", "", f"{status}",
-            f"连续签到天数: {consecutive_days}",
-            f"总积分: {current_points}",
-            f"累计签到次数: {user_checkin_count}", "", "最近签到历史:"]
+    text = [
+        f"📝 MJJBox 签到结果",
+        "",
+        f"{status}，今日获得积分: {today_points} 分",
+        f"连续签到天数: {consecutive_days}",
+        f"总积分: {current_points}",
+        f"累计签到次数: {user_checkin_count}",
+        "",
+        "最近签到历史:"
+    ]
 
     for h in checkin_history:
         date = h.get("date", "")
