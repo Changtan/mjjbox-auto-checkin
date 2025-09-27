@@ -1,27 +1,35 @@
-name: MJJBox Checkin
+name: MJJBox Daily Checkin
 
+# 每天定时执行 + 可手动触发
 on:
   schedule:
-    - cron: "0 2 * * *"   # 每天 10:00 (UTC+8)
+    - cron: "0 2 * * *"  # 每天北京时间 10:00 (UTC+8)
   workflow_dispatch:
 
 jobs:
   checkin:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
+    steps:
+      # 1️⃣ 拉取仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ 安装 Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: Install deps
+      # 3️⃣ 安装依赖
+      - name: Install dependencies
         run: pip install requests
 
-      - name: Run checkin
+      # 4️⃣ 运行签到脚本
+      - name: Run MJJBox checkin
         env:
-          MJJBOX_COOKIE: ${{ secrets.MJJBOX_COOKIE }}
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          MJJBOX_COOKIE: ${{ secrets.MJJBOX_COOKIE }}   # 浏览器抓到的登录 Cookie
+          CSRF_TOKEN: ${{ secrets.CSRF_TOKEN }}         # x-csrf-token
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}     # Telegram Bot Token
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}         # Telegram Chat ID
         run: python checkin.py
