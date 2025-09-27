@@ -1,0 +1,1 @@
+# mjjbox-auto-checkin
