@@ -3,7 +3,7 @@ name: MJJBox Daily Checkin
 # 每天定时执行 + 可手动触发
 on:
   schedule:
-    - cron: "0 2 * * *"  # 每天北京时间 10:00 (UTC+8)
+    - cron: "0 19 * * *"  # 每天北京时间 10:00 (UTC+8)
   workflow_dispatch:
 
 jobs:
