@@ -1,0 +1,26 @@
+name: Keep Repo Active
+
+on:
+  # 触发器1: 手动触发 (为了能立即测试)
+  workflow_dispatch:
+
+  # 触发器2: 定时触发 (用于长期保持活跃)
+  schedule:
+    # 每月1号和15号的凌晨执行
+    - cron: '0 0 1,15 * *'
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create empty commit and push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "chore: keep repo active"
+          git push
